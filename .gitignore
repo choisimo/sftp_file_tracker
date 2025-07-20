@@ -1,0 +1,45 @@
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+**/*.env
+!example.**.env
+
+# Log files
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache files
+data/known_files.json
+.cache/
+
+# PM2 files
+.pm2/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
