@@ -1,0 +1,40 @@
+{
+  "name": "file-monitor",
+  "version": "1.0.0",
+  "description": "로컬/원격 서버의 새 파일을 감지하여 웹훅으로 알림을 보내는 서비스",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "local": "node local-server.js",
+    "local:dev": "nodemon local-server.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:start:local": "pm2 start ecosystem.local.config.js",
+    "pm2:stop": "pm2 stop file-monitor",
+    "pm2:restart": "pm2 restart file-monitor"
+  },
+  "keywords": [
+    "sftp",
+    "local-files",
+    "file-monitor",
+    "webhook",
+    "n8n",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ssh2-sftp-client": "^10.0.3",
+    "chokidar": "^3.5.3",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
