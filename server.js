@@ -3,6 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const logger = require('./src/logger');
@@ -23,6 +24,11 @@ class SftpFileMonitor {
 
     this.monitorDir = process.env.MONITOR_DIR || '/';
     this.webhookUrl = process.env.WEBHOOK_URL;
+    this.webhookJwtSecret = process.env.WEBHOOK_JWT_SECRET;
+    this.webhookJwtIssuer = process.env.WEBHOOK_JWT_ISSUER || 'sftp-monitor';
+    this.webhookJwtAudience = process.env.WEBHOOK_JWT_AUDIENCE || 'webhook-receiver';
+    this.webhookJwtExpiresIn = process.env.WEBHOOK_JWT_EXPIRES_IN || '1h';
+    this.webhookApiKey = process.env.WEBHOOK_API_KEY;
     this.pollInterval = parseInt(process.env.POLL_INTERVAL_MS) || 60000;
     this.cacheFilePath = process.env.CACHE_FILE_PATH || './data/known_files.json';
     this.maxRetryAttempts = parseInt(process.env.MAX_RETRY_ATTEMPTS) || 3;
@@ -114,10 +120,7 @@ class SftpFileMonitor {
 
       const response = await axios.post(this.webhookUrl, payload, {
         timeout: 10000,
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'SFTP-File-Monitor/1.0.0'
-        }
+        headers: this.getAuthHeaders()
       });
 
       logger.info(`Webhook sent successfully for file: ${fileInfo.name}`, {
@@ -135,6 +138,33 @@ class SftpFileMonitor {
       }
       
       throw error;
+    }
+  }
+
+  generateJwtToken() {
+    if (!this.webhookJwtSecret) {
+      logger.debug('No JWT secret configured, skipping JWT token generation');
+      return null;
+    }
+
+    try {
+      const payload = {
+        iss: this.webhookJwtIssuer,
+        aud: this.webhookJwtAudience,
+        iat: Math.floor(Date.now() / 1000),
+        service: 'sftp-file-monitor'
+      };
+
+      const token = jwt.sign(payload, this.webhookJwtSecret, {
+        expiresIn: this.webhookJwtExpiresIn,
+        algorithm: 'HS256'
+      });
+
+      logger.debug('JWT token generated successfully');
+      return token;
+    } catch (error) {
+      logger.error(`Failed to generate JWT token: ${error.message}`);
+      return null;
     }
   }
 

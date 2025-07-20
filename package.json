@@ -11,7 +11,12 @@
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:start:local": "pm2 start ecosystem.local.config.js",
     "pm2:stop": "pm2 stop file-monitor",
-    "pm2:restart": "pm2 restart file-monitor"
+    "pm2:restart": "pm2 restart file-monitor",
+    "docker:build": "./docker-setup.sh",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f file-monitor",
+    "docker:restart": "docker-compose restart file-monitor"
   },
   "keywords": [
     "sftp",
@@ -24,12 +29,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "ssh2-sftp-client": "^10.0.3",
-    "chokidar": "^3.5.3",
     "axios": "^1.6.2",
+    "chokidar": "^3.5.3",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
-    "winston": "^3.11.0",
-    "moment": "^2.29.4"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "moment": "^2.29.4",
+    "multer": "^2.0.2",
+    "ssh2-sftp-client": "^10.0.3",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

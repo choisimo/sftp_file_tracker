@@ -23,7 +23,34 @@ cd file-monitor
 ./install.sh
 ```
 
-### 2-A. 로컬 파일 모니터링 (권장)
+### 2-A. Docker로 실행 (가장 간단)
+
+가장 쉬운 방법으로 Docker 컨테이너로 실행:
+
+```bash
+# Docker 이미지 빌드
+npm run docker:build
+
+# Docker Compose로 실행
+npm run docker:up
+
+# 로그 확인
+npm run docker:logs
+
+# 중지
+npm run docker:down
+```
+
+**Docker 실행 후 테스트:**
+```bash
+# 테스트 파일 생성 (watch 폴더에)
+echo "테스트 파일입니다" > watch/test.txt
+
+# 로그에서 웹훅 전송 확인
+npm run docker:logs
+```
+
+### 2-B. 로컬 파일 모니터링 (직접 실행)
 
 현재 서버의 폴더를 실시간으로 모니터링하려면:
 
@@ -37,7 +64,7 @@ cp .env.local.example .env.local
 # MONITOR_DIR=/path/to/folder  # 특정 절대 경로
 ```
 
-### 2-B. SFTP 파일 모니터링
+### 2-C. SFTP 파일 모니터링
 
 원격 SFTP 서버를 모니터링하려면:
 
@@ -60,6 +87,21 @@ WEBHOOK_URL=https://n8n.nodove.com/webhook/nas/detect/new
 ```
 
 ### 3. 실행
+
+#### 🐳 Docker 실행 (권장)
+
+```bash
+# 빌드 및 실행
+npm run docker:build    # Docker 이미지 빌드
+npm run docker:up       # 백그라운드에서 실행
+
+# 관리 명령어
+npm run docker:logs     # 실시간 로그 확인
+npm run docker:restart  # 재시작
+npm run docker:down     # 중지 및 제거
+```
+
+#### 💻 직접 실행
 
 ```bash
 # 로컬 파일 모니터링 (실시간)
@@ -156,32 +198,80 @@ file-monitor/
 ├── ecosystem.local.config.js    # 로컬 PM2 설정
 ├── .env.example                 # SFTP 환경변수 템플릿
 ├── .env.local.example          # 로컬 환경변수 템플릿
+├── .env.docker                 # Docker 환경변수
 ├── .env / .env.local           # 환경변수 (실제 값)
-├── install.sh                  # 설치 스크립트
-├── watch/                      # 기본 감시 폴더 (로컬용)
-├── logs/                       # 로그 파일
-└── data/                       # 캐시 데이터
-    └── known_files.json        # 알려진 파일 목록
+├── Dockerfile                  # Docker 이미지 설정
+├── docker-compose.yml          # Docker Compose 설정  
+├── .dockerignore              # Docker 빌드 제외 파일
+├── docker-setup.sh            # Docker 빌드 스크립트
+├── install.sh                 # 설치 스크립트
+├── watch/                     # 기본 감시 폴더 (로컬용)
+├── logs/                      # 로그 파일
+└── data/                      # 캐시 데이터
+    └── known_files.json       # 알려진 파일 목록
 ```
 
 ## 🛠️ NPM 스크립트
 
 ```bash
-# 로컬 파일 모니터링
-npm run local            # 일반 실행
-npm run local:dev        # 개발 모드 (nodemon)
+# 🐳 Docker 명령어 (권장)
+npm run docker:build     # Docker 이미지 빌드
+npm run docker:up        # Docker Compose로 실행  
+npm run docker:down      # 중지 및 제거
+npm run docker:logs      # 실시간 로그 확인
+npm run docker:restart   # 재시작
 
-# SFTP 파일 모니터링  
-npm start               # 일반 실행
-npm run dev            # 개발 모드 (nodemon)
+# 💻 직접 실행
+npm run local            # 로컬 파일 모니터링
+npm run local:dev        # 로컬 개발 모드 (nodemon)
+npm start               # SFTP 모니터링
+npm run dev            # SFTP 개발 모드 (nodemon)
 
-# PM2 프로덕션 실행
+# ⚙️ PM2 프로덕션 실행
 npm run pm2:start:local    # 로컬 모니터링 시작
 npm run pm2:start         # SFTP 모니터링 시작
-
-# PM2 관리
 npm run pm2:stop          # 중지
 npm run pm2:restart       # 재시작
+```
+
+## 🐳 Docker 사용법
+
+### 기본 실행
+
+```bash
+# 1단계: 이미지 빌드
+npm run docker:build
+
+# 2단계: 실행 (포트 13030에서 서비스됩니다)
+npm run docker:up
+
+# 3단계: 테스트
+echo "테스트 파일" > watch/test.txt
+
+# 4단계: 로그 확인
+npm run docker:logs
+```
+
+### Docker 볼륨 매핑
+
+```bash
+# watch/ - 모니터링할 파일들을 여기에 추가
+# logs/  - 애플리케이션 로그 출력
+# data/  - 파일 캐시 데이터
+
+# 다른 폴더를 모니터링하려면 docker-compose.yml 수정:
+volumes:
+  - /your/custom/path:/app/watch:ro
+```
+
+### Docker 환경변수 수정
+
+```bash
+# docker-compose.yml에서 환경변수 변경
+environment:
+  - WEBHOOK_URL=https://your-webhook-url.com
+  - LOG_LEVEL=debug
+  - IGNORE_INITIAL_FILES=false
 ```
 
 ## 📊 로깅

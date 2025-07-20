@@ -3,7 +3,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 const logger = require('./src/logger');
 

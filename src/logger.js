@@ -32,13 +32,17 @@ const logger = winston.createLogger({
   ]
 });
 
-if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
-    )
-  }));
-}
+// 콘솔 출력 추가 (Docker 환경에서도 표준 출력 가능)
+logger.add(new winston.transports.Console({
+  format: winston.format.combine(
+    winston.format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    winston.format.colorize(),
+    winston.format.printf(({ timestamp, level, message, service, ...meta }) => {
+      return `${timestamp} [${service}] ${level}: ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+    })
+  )
+}));
 
 module.exports = logger;
