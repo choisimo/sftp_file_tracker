@@ -5,8 +5,11 @@ yarn-error.log*
 
 # Environment files
 .env
-**/*.env
-!example.**.env
+.env.local
+*.env
+!*.example
+!*.example.env
+!*.env.example
 
 # Log files
 logs/
